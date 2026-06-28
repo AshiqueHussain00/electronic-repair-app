@@ -13,6 +13,7 @@ import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppRoutes } from './routes';
 import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -56,6 +57,7 @@ export default function App() {
             },
           }}
         />
+        <SpeedInsights />
       </AuthProvider>
     </BrowserRouter>
   );
