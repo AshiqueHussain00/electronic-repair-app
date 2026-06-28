@@ -721,11 +721,17 @@ async function startServer() {
     console.log('[SYSTEM] Servicing static production builds.');
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[SYSTEM] Full-Stack server booted at http://0.0.0.0:${PORT}`);
-  });
+  // Only start listener when running locally (not on Vercel serverless)
+  if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`[SYSTEM] Full-Stack server booted at http://0.0.0.0:${PORT}`);
+    });
+  }
 }
 
 startServer().catch((err) => {
   console.error('[CRITICAL] Server failed to start:', err);
 });
+
+// Export for Vercel serverless function
+export default app;
