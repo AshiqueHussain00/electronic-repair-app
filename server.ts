@@ -1,28 +1,37 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { getInitialsAvatar } from './src/utils';
+
+// Inline avatar helper to prevent path import issues in production bundling
+function getInitialsAvatar(name: string): string {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563EB&color=ffffff&bold=true&size=128`;
+}
 
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'magic-mistry-ultra-secret-key-1029';
 
 // Setup file-based JSON database path
-const DB_FILE = path.join(process.cwd(), 'database.json');
+const isVercel = !!process.env.VERCEL;
+const DB_FILE = isVercel ? path.join('/tmp', 'database.json') : path.join(process.cwd(), 'database.json');
 
-// Initialize database file if empty
+// Initialize database file
 if (!fs.existsSync(DB_FILE)) {
-  fs.writeFileSync(
-    DB_FILE,
-    JSON.stringify({
+  let initialData = '';
+  // On Vercel, copy packaged template from process.cwd() if it exists
+  const localTemplatePath = path.join(process.cwd(), 'database.json');
+  if (isVercel && fs.existsSync(localTemplatePath)) {
+    try {
+      initialData = fs.readFileSync(localTemplatePath, 'utf-8');
+    } catch (e) {
+      console.error('Failed to read template database:', e);
+    }
+  }
+  
+  if (!initialData) {
+    initialData = JSON.stringify({
       users: [
         {
           id: 'user-cust-1',
@@ -69,8 +78,9 @@ if (!fs.existsSync(DB_FILE)) {
       ],
       bookings: [],
       otps: [],
-    })
-  );
+    }, null, 2);
+  }
+  fs.writeFileSync(DB_FILE, initialData);
 }
 
 // Read and write helper for persistent state
@@ -706,6 +716,7 @@ app.get('/api/admin/stats', authenticateToken, (req: any, res: any) => {
    ========================================== */
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
