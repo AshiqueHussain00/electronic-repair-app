@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Environment & secrets
+.env
+.env.local
+.env.production
+CREDENTIALS.md
+
+# Database (contains real user data)
+database.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Vite cache
+.vite/
