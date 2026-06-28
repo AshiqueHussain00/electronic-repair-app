@@ -1,6 +1,0 @@
-{
-  "name": "Magic Mistry",
-  "description": "Professional Electronics Repair & Home Appliance Service Booking Platform",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
